@@ -8,17 +8,14 @@ const DEBOUNCE_DELAY = 300;
 
 const inputEl = document.querySelector('#search-box');
 const countryListEl = document.querySelector('.country-list');
+const countryInfoEl = document.querySelector('.country-info');
 
 inputEl.addEventListener('input', debounce(onFormInput, DEBOUNCE_DELAY));
-
-Notify.failure('Oops, there is no country with that name');
-Notify.info('Too many matches found. Please enter a more specific name.');
 
 function onFormInput(event) {
   event.preventDefault();
   const name = event.target.value;
   fetchCountries(name)
-    // .then(response => response.json())
     .then(renderCountryCard)
     .catch(onError)
     .finally(console.log('Ura'));
@@ -31,22 +28,27 @@ function fetchCountries(name) {
 }
 
 function renderCountryCard(country) {
-  console.log(country[0].name.official);
-  console.log(country[0].capital[0]);
-  console.log(country[0].flags.svg);
-  // console.log(country[0].languages.ukr);
-  // console.log(country[0].capital[0]);
-  console.log(country[0].population);
-  console.log(country[0].name.nativeName);
+  console.log(country.length);
+  let markup;
 
-  if ((country.length = 1)) {
+  if (country.length > 10) {
+    Notify.info('Too many matches found. Please enter a more specific name.');
+  } else if (country.length > 1 && country.length <= 10) {
+    country.forEach((el, idx, arr) => {
+      markup += `<li class = "country__item"><img src="${el.flags.svg}" alt="flag" width="60" /><p class="country__name">${el.name.official}</p>`;
+    });
+    countryListEl.innerHTML = markup;
+  } else if ((country.length = 1)) {
+    // console.log(country);
+
     const markup = `<img src="${country[0].flags.svg}" alt="flag" width="100" />
       <p class="country__name">${country[0].name.official}</p>
       <p class="country__capital">${country[0].capital[0]}</p>
       <p class="country__population">${country[0].population}</p>`;
     countryListEl.innerHTML = markup;
-  } else if (country.length > 1) {
-    // const markup = country.forEach(element => {
-    // });
   }
+}
+
+function onError() {
+  Notify.failure('Oops, there is no country with that name');
 }

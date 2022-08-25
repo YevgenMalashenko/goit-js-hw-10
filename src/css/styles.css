@@ -22,3 +22,7 @@ body {
 .country-list {
   list-style: none;
 }
+
+.country__item {
+  display: flex;
+}
